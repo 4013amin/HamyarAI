@@ -20,8 +20,7 @@ def start_chat_view(request , agent_type):
     if not session:
         session = ChatSession.objects.create(user=request.user ,  agent_type=agent_type)
 
-    return redirect('chat_room', session_id=session.id) 
-
+    return redirect('chat:chat_room', session_id=session.id)
 
 #Chat room
 @login_required

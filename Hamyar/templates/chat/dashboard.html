@@ -39,7 +39,7 @@
                     <h2 class="text-lg font-bold text-slate-200">دستیار فرانت‌اند (Frontend)</h2>
                     <p class="text-xs text-slate-400 mt-3 leading-relaxed">متخصص در HTML، CSS، کدهای جاوااسکریپت، فریم‌ورک‌های React و Vue، استایل‌دهی Tailwind و مفاهیم رابط کاربری.</p>
                 </div>
-                <a href="{% url 'start_chat' 'frontend' %}" class="mt-8 w-full py-3 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold text-center transition-all shadow-lg shadow-sky-600/10">
+                <a href="{% url 'chat:start_chat' 'frontend' %}" class="mt-8 w-full py-3 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold text-center transition-all shadow-lg shadow-sky-600/10">
                     شروع گفتگو با فرانت‌اند
                 </a>
             </div>
@@ -53,7 +53,7 @@
                     <h2 class="text-lg font-bold text-slate-200">دستیار بک‌اند (Backend)</h2>
                     <p class="text-xs text-slate-400 mt-3 leading-relaxed">متخصص پایتون، فریم‌ورک‌های جنگو و نودجی‌اس، پایگاه‌های داده SQL/NoSQL، طراحی APIها، امنیت سرور و معماری سیستم.</p>
                 </div>
-                <a href="{% url 'start_chat' 'backend' %}" class="mt-8 w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold text-center transition-all shadow-lg shadow-emerald-600/10">
+                <a href="{% url 'chat:start_chat' 'backend' %}" class="mt-8 w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold text-center transition-all shadow-lg shadow-emerald-600/10">
                     شروع گفتگو با بک‌اند
                 </a>
             </div>
@@ -67,7 +67,7 @@
                     <h2 class="text-lg font-bold text-slate-200">دستیار عمومی (General)</h2>
                     <p class="text-xs text-slate-400 mt-3 leading-relaxed">دستیار همه‌فن‌حریف برای پاسخ به تمام سوالات متفرقه، نگارش متون، ترجمه کلمات و همفکری در کارهای روزمره شما.</p>
                 </div>
-                <a href="{% url 'start_chat' 'general' %}" class="mt-8 w-full py-3 bg-violet-600 hover:bg-violet-500 text-white rounded-xl text-xs font-bold text-center transition-all shadow-lg shadow-violet-600/10">
+                <a href="{% url 'chat:start_chat' 'general' %}" class="mt-8 w-full py-3 bg-violet-600 hover:bg-violet-500 text-white rounded-xl text-xs font-bold text-center transition-all shadow-lg shadow-violet-600/10">
                     شروع گفتگو با عمومی
                 </a>
             </div>
