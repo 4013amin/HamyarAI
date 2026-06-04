@@ -4,100 +4,140 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>پروفایل کاربری</title>
-    <!-- استفاده از Tailwind CSS برای طراحی زیبا -->
+    <!-- لود بهینه تایلویند بدون فونت‌های کند گوگل -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+        }
+        /* پس‌زمینه توری فنی منطبق با داشبورد */
+        .bg-grid {
+            background-size: 50px 50px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+        }
+        /* استایل‌دهی سراسری و هوشمند به فیلدهای خروجی فرم‌های جنگو */
+        input[type="text"], textarea {
+            width: 100%;
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            border: 1px solid #1e293b !important;
+            color: #f1f5f9 !important;
+            border-radius: 0.75rem !important;
+            padding: 0.75rem !important;
+            font-size: 0.875rem !important;
+            outline: none !important;
+            transition: all 0.2s !important;
+        }
+        input[type="text"]:focus, textarea:focus {
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans min-h-screen">
+<body class="bg-[#030712] bg-grid text-slate-100 min-h-screen p-4 md:p-12 relative overflow-x-hidden">
 
-    <div class="max-w-4xl mx-auto py-10 px-4">
-        <!-- پیام‌های سیستم (Notification) -->
+    <!-- افکت‌های نوری اتمسفریک پس‌زمینه -->
+    <div class="absolute top-0 left-1/3 w-96 h-96 bg-indigo-600/5 rounded-full blur-[140px] pointer-events-none"></div>
+    <div class="absolute bottom-10 right-1/4 w-[500px] h-[500px] bg-violet-600/5 rounded-full blur-[150px] pointer-events-none"></div>
+
+    <div class="max-w-4xl mx-auto relative z-10">
+        
+        <!-- هدر کنترل پروفایل -->
+        <header class="flex justify-between items-center border-b border-slate-900/60 pb-6 mb-12">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse"></span>
+                <span class="text-xs text-slate-400 font-semibold uppercase tracking-widest">پروفایل کاربری</span>
+            </div>
+            <!-- دکمه مهم بازگشت به داشبورد گفتگوها -->
+            <a href="{% url 'chat:dashboard' %}" class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-violet-600 text-white text-xs font-semibold rounded-xl hover:from-indigo-600 hover:to-violet-750 transition-all shadow-lg shadow-indigo-500/15">
+                ورود به پنل گفتگوها
+            </a>
+        </header>
+
+        <!-- نمایش پیام‌های موفقیت‌آمیز ذخیره فرم -->
         {% if messages %}
-            <div class="mb-6">
+            <div class="mb-6 space-y-2">
                 {% for message in messages %}
-                    <div class="p-4 rounded-lg bg-green-50 text-green-800 border border-green-200 text-sm font-medium">
+                    <div class="p-4 rounded-xl bg-indigo-950/40 border border-indigo-900/50 text-indigo-300 text-sm font-medium">
                         {{ message }}
                     </div>
                 {% endfor %}
             </div>
         {% endif %}
 
-        <!-- کارت بالای پروفایل (مشخصات کلی) -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8 mb-8">
+        <!-- کارت بالای پروفایل (Glassmorphic Profile Header) -->
+        <div class="bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-800/80 p-6 md:p-8 mb-8 shadow-xl">
             <div class="flex flex-col md:flex-row items-center gap-6">
-                <!-- تصویر آواتار -->
-                <div class="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-md">
-                    {% if user.profile.avatar %}
-                        <img src="{{ user.profile.avatar.url }}" alt="Avatar" class="w-full h-full object-cover">
-                    {% else %}
-                        <!-- اگر آواتار نبود، ساخت خودکار بر اساس نام کاربر -->
-                        <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=6366f1&color=fff&size=128" alt="Default Avatar" class="w-full h-full object-cover">
-                    {% endif %}
+                <!-- تصویر آواتار با فریم نئون بنفش -->
+                <div class="relative w-24 h-24 md:w-32 md:h-32 rounded-full p-1 bg-gradient-to-tr from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/10 shrink-0">
+                    <div class="w-full h-full rounded-full overflow-hidden bg-slate-950">
+                        {% if user.profile.avatar %}
+                            <img src="{{ user.profile.avatar.url }}" alt="Avatar" class="w-full h-full object-cover">
+                        {% else %}
+                            <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=6366f1&color=fff&size=128" alt="Default Avatar" class="w-full h-full object-cover">
+                        {% endif %}
+                    </div>
                 </div>
 
                 <div class="text-center md:text-right flex-1">
-                    <h1 class="text-2xl font-bold text-gray-900">
-                        {% if user.get_full_name %}
-                            {{ user.get_full_name }}
-                        {% else %}
-                            {{ user.username }}
-                        {% endif %}
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-200 to-slate-200 bg-clip-text text-transparent">
+                        {{ user.get_full_name|default:user.username }}
                     </h1>
-                    <p class="text-sm text-gray-500 mt-1">@{{ user.username }}</p>
-                    <p class="text-sm text-gray-600 mt-2 bg-gray-50 inline-block px-3 py-1 rounded-full border border-gray-150">
-                        ایمیل: {{ user.email|default:"ثبت نشده" }}
-                    </p>
+                    <p class="text-xs text-slate-500 mt-1">شناسه کاربری: @{{ user.username }}</p>
+                    <div class="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
+                        <span class="text-xs px-3 py-1 bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 rounded-full">سیستم بدون ایمیل فعال است</span>
+                    </div>
                 </div>
 
-                <div class="flex gap-3">
-                    <a href="{% url 'logout' %}" class="px-4 py-2 bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100 text-sm font-medium transition-colors">
+                <div>
+                    <a href="{% url 'logout' %}" class="px-4 py-2.5 bg-rose-950/40 text-rose-300 border border-rose-900/50 rounded-xl hover:bg-rose-900/60 text-xs font-semibold transition-colors block text-center">
                         خروج از حساب
                     </a>
                 </div>
             </div>
         </div>
 
-        <!-- فرم ویرایش اطلاعات -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
-            <h2 class="text-xl font-bold text-gray-900 border-b border-gray-100 pb-4 mb-6">تنظیمات و ویرایش مشخصات</h2>
+        <!-- فرم تنظیمات و ویرایش اطلاعات (تاریک و شیشه‌ای) -->
+        <div class="bg-slate-900/20 backdrop-blur-md rounded-2xl border border-slate-800/80 p-6 md:p-8 shadow-xl">
+            <h2 class="text-lg font-bold text-slate-200 border-b border-slate-850 pb-4 mb-6">تنظیمات و ویرایش مشخصات</h2>
             
             <form method="POST" enctype="multipart/form-data" class="space-y-6">
                 {% csrf_token %}
 
-                <!-- بخش اطلاعات حساب کاربری (User) -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- بخش فیلدهای اطلاعات کاربر (بدون ایمیل) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700">نام</label>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">نام</label>
                         {{ u_form.first_name }}
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700">نام خانوادگی</label>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">نام خانوادگی</label>
                         {{ u_form.last_name }}
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700">نام کاربری</label>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">نام کاربری</label>
                         {{ u_form.username }}
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700">آدرس ایمیل</label>
-                        {{ u_form.email }}
                     </div>
                 </div>
 
-                <!-- بخش اطلاعات تکمیلی (Profile) -->
-                <div class="border-t border-gray-100 pt-6 space-y-6">
+                <!-- بخش فیلدهای تصویر و بیوگرافی (Profile) -->
+                <div class="border-t border-slate-850 pt-6 space-y-6">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">تصویر پروفایل جدید</label>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">تصویر پروفایل جدید</label>
                         {{ p_form.avatar }}
+                        <p class="text-[10px] text-slate-500 mt-1">توصیه می‌شود از تصاویر مربعی استفاده کنید.</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">بیوگرافی / درباره من</label>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">بیوگرافی / درباره من</label>
                         {{ p_form.bio }}
                     </div>
                 </div>
 
-                <!-- دکمه ثبت تغییرات -->
-                <div class="flex justify-end pt-4 border-t border-gray-100">
-                    <button type="submit" class="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 text-sm font-semibold shadow-sm transition-all hover:shadow-md">
+                <!-- دکمه‌های کنترل پایینی -->
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-slate-850">
+                    <p class="text-xs text-slate-500 text-center sm:text-right">تغییرات شما به صورت آنی در تمام بخش‌های هوش مصنوعی اعمال می‌شود.</p>
+                    <button type="submit" class="px-6 py-3 bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-750 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-500/10 transition-all hover:shadow-indigo-500/20 w-full sm:w-auto">
                         ذخیره تمامی تغییرات
                     </button>
                 </div>

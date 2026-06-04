@@ -4,12 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ثبت‌نام در پنل هوشمند</title>
-    <!-- لود بهینه تایلویند -->
+    <!-- لود بهینه تایلویند بدون فونت‌های گوگل -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* استفاده از فونت‌های مدرن سیستمی بدون نیاز به لود از گوگل */
         body { 
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+        }
+        /* پس‌زمینه توری فنی هماهنگ با بقیه صفحات */
+        .bg-grid {
+            background-size: 50px 50px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
         }
         form p {
             margin-bottom: 1.25rem;
@@ -28,6 +34,7 @@
             margin-top: 0.25rem;
             line-height: 1.4;
         }
+        /* استایل‌دهی هوشمند به لیست خطاهای بالای فیلدها در ثبت‌نام */
         ul.errorlist {
             margin-bottom: 1rem;
             padding: 0.5rem 1rem;
@@ -38,20 +45,37 @@
             font-size: 0.75rem;
             list-style-type: none;
         }
+        /* استایل‌دهی سراسری و هوشمند به فیلدهای ورودی جنگو */
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            background-color: rgba(15, 23, 42, 0.8) !important;
+            border: 1px solid #1e293b !important;
+            color: #f1f5f9 !important;
+            border-radius: 0.75rem !important;
+            padding: 0.75rem !important;
+            font-size: 0.875rem !important;
+            outline: none !important;
+            transition: all 0.2s !important;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
+        }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+<body class="bg-[#030712] bg-grid text-slate-100 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
     
-    <!-- افکت‌های نوری بک‌گراند -->
+    <!-- افکت‌های نوری اتمسفریک پس‌زمینه -->
     <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none"></div>
     <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-    <div class="w-full max-w-md bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-slate-800 p-6 md:p-8 relative z-10 shadow-2xl">
+    <div class="w-full max-w-md bg-slate-900/50 backdrop-blur-md rounded-2xl border border-slate-800/80 p-6 md:p-8 relative z-10 shadow-2xl">
         <div class="text-center mb-8">
             <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-200 to-slate-200 bg-clip-text text-transparent">ساخت حساب کاربری</h1>
             <p class="text-xs text-slate-400 mt-2">برای استفاده از دستیارهای هوشمند ثبت‌نام کنید</p>
         </div>
 
+        <!-- فرم ثبت‌نام -->
         <form method="POST" class="space-y-4">
             {% csrf_token %}
             
@@ -59,7 +83,7 @@
                 {{ form.as_p }}
             </div>
 
-            <button type="submit" class="w-full mt-6 py-3 bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white font-semibold rounded-xl text-sm transition-all shadow-lg shadow-indigo-500/10">
+            <button type="submit" class="w-full mt-6 py-3 bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-650 hover:to-violet-750 text-white font-semibold rounded-xl text-sm transition-all shadow-lg shadow-indigo-500/10 hover:shadow-indigo-500/20">
                 ثبت‌نام و عضویت
             </button>
         </form>
