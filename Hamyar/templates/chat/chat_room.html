@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>گفتگو با دستیار هوشمند</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; }
+        /* کاستوم اسکرول‌بار شیک تیره برای باکس پیام‌ها */
+        #chat-box::-webkit-scrollbar { width: 6px; }
+        #chat-box::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); }
+        #chat-box::-webkit-scrollbar-thumb { background: #334155; border-radius: 99px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 h-screen flex flex-col justify-between overflow-hidden relative">
+
+    <!-- افکت نوری بالای صفحه -->
+    <div class="absolute top-0 right-1/4 w-96 h-96 bg-indigo-600/5 rounded-full blur-[150px] pointer-events-none"></div>
+
+    <!-- هدر چت -->
+    <header class="bg-slate-900/50 backdrop-blur-md border-b border-slate-800/80 p-4 md:px-8 flex items-center justify-between z-10">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-600 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/10">
+                AI
+            </div>
+            <div>
+                <h1 class="text-sm md:text-base font-bold text-slate-100">{{ session.get_agent_type_display }}</h1>
+                <p class="text-[10px] text-emerald-400 flex items-center gap-1.5 mt-0.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> آنلاین
+                </p>
+            </div>
+        </div>
+        <a href="{% url 'dashboard' %}" class="px-3.5 py-1.5 bg-slate-850 hover:bg-slate-800 border border-slate-800 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200 transition-colors">
+            بازگشت به داشبورد
+        </a>
+    </header>
+
+    <!-- بخش پیام‌ها (Scrollable) -->
+    <main id="chat-box" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 max-w-4xl w-full mx-auto z-10">
+        {% for message in chat_messages %}
+            <div class="flex gap-4 {% if message.sender == 'user' %}flex-row-reverse{% endif %}">
+                <!-- آواتار یا لوگوی فرستنده -->
+                <div class="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-sm flex items-center justify-center text-xs font-bold
+                    {% if message.sender == 'user' %} bg-indigo-600 text-white {% else %} bg-slate-800 text-slate-300 border border-slate-700 {% endif %}">
+                    {% if message.sender == 'user' %}
+                        U
+                    {% else %}
+                        AI
+                    {% endif %}
+                </div>
+                <!-- متن پیام -->
+                <div class="max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm
+                    {% if message.sender == 'user' %} bg-indigo-600 text-white rounded-tr-none {% else %} bg-slate-900/80 border border-slate-800 text-slate-200 rounded-tl-none {% endif %}">
+                    <p class="whitespace-pre-line">{{ message.content }}</p>
+                </div>
+            </div>
+        {% empty %}
+            <!-- پیام خوش‌آمدگویی در صورت خالی بودن جلسه چت -->
+            <div id="welcome-message" class="text-center py-20">
+                <p class="text-slate-500 text-sm">شروع گفتگو! سوال خود را بنویسید.</p>
+            </div>
+        {% endfor %}
+
+        <!-- المان انیمیشن در حال تایپ... -->
+        <div id="typing-indicator" class="flex gap-4 hidden">
+            <div class="w-9 h-9 rounded-xl bg-slate-800 text-slate-300 border border-slate-700 flex items-center justify-center text-xs font-bold shrink-0">
+                AI
+            </div>
+            <div class="bg-slate-900/80 border border-slate-800 text-slate-400 rounded-2xl rounded-tl-none px-4 py-3 text-sm flex items-center gap-1">
+                <span>درحال نوشتن پاسخ</span>
+                <span class="animate-bounce" style="animation-delay: 0.1s">.</span>
+                <span class="animate-bounce" style="animation-delay: 0.2s">.</span>
+                <span class="animate-bounce" style="animation-delay: 0.3s">.</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- اینپوت ارسال پیام (فوتر) -->
+    <footer class="bg-slate-950 border-t border-slate-900/80 p-4 md:pb-6 z-10">
+        <div class="max-w-4xl mx-auto">
+            <form id="message-form" class="relative">
+                {% csrf_token %}
+                <textarea id="message-input" rows="1" placeholder="پیام خود را بنویسید (Enter برای ارسال)..." 
+                    class="w-full bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-2xl py-4 pr-4 pl-16 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none resize-none overflow-hidden max-h-48"></textarea>
+                
+                <button type="submit" id="send-btn" class="absolute left-3 bottom-3 w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white flex items-center justify-center transition-all shadow-lg shadow-indigo-500/10">
+                    <svg class="w-5 h-5 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+            </form>
+        </div>
+    </footer>
+
+    <!-- جاوااسکریپت مدیریت ارسال ریل‌تایم (AJAX) -->
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const form = document.getElementById('message-form');
+        const input = document.getElementById('message-input');
+        const btn = document.getElementById('send-btn');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const welcomeMessage = document.getElementById('welcome-message');
+
+        // اسکرول خودکار به انتهای باکس چت
+        function scrollToBottom() {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+        scrollToBottom();
+
+        // ارتفاع متغیر خودکار تکست‌آریا با نوشتن متن طولانی
+        input.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // پشتیبانی از ارسال با دکمه Enter
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                form.requestSubmit();
+            }
+        });
+
+        // مدیریت ارسال پیام به وب‌سرویس
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const message = input.value.trim();
+            if (!message) return;
+
+            // ۱. غیرفعال کردن موقت فیلد و دکمه برای جلوگیری از کلیک اسپم
+            input.value = '';
+            input.style.height = 'auto';
+            input.disabled = true;
+            btn.disabled = true;
+
+            // پنهان کردن پیام خوش‌آمدگویی در اولین چت
+            if (welcomeMessage) welcomeMessage.style.display = 'none';
+
+            // ۲. ساخت حباب پیام کاربر در فرانت‌اند
+            const userBubble = `
+                <div class="flex gap-4 flex-row-reverse">
+                    <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-sm">U</div>
+                    <div class="max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-indigo-600 text-white rounded-tr-none shadow-sm">
+                        <p class="whitespace-pre-line">${message}</p>
+                    </div>
+                </div>
+            `;
+            // الحاق پیام کاربر به باکس چت و اسکرول به پایین
+            typingIndicator.insertAdjacentHTML('beforebegin', userBubble);
+            scrollToBottom();
+
+            // ۳. نمایش افکت "درحال نوشتن پاسخ..."
+            typingIndicator.classList.remove('hidden');
+            scrollToBottom();
+
+            // ۴. ارسال درخواست به وب‌سرویس جنگو (POST AJAX)
+            try {
+                const response = await fetch('{% url "send_message" session.id %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}' // ضمیمه کردن توکن امنیتی جنگو
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+
+                // ۵. دریافت پاسخ و ساخت حباب پیام هوش مصنوعی
+                if (data.status === 'success') {
+                    const aiBubble = `
+                        <div class="flex gap-4">
+                            <div class="w-9 h-9 rounded-xl bg-slate-800 text-slate-300 border border-slate-700 flex items-center justify-center text-xs font-bold shrink-0 shadow-sm">AI</div>
+                            <div class="max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-slate-900/80 border border-slate-800 text-slate-200 rounded-tl-none shadow-sm">
+                                <p class="whitespace-pre-line">${data.reply}</p>
+                            </div>
+                        </div>
+                    `;
+                    typingIndicator.insertAdjacentHTML('beforebegin', aiBubble);
+                } else {
+                    alert('خطایی رخ داد: ' + data.error);
+                }
+            } catch (error) {
+                console.error(error);
+                alert('ارتباط با سرور قطع شد.');
+            } finally {
+                // ۶. مخفی کردن انیمیشن در حال تایپ و فعال کردن مجدد فرم
+                typingIndicator.classList.add('hidden');
+                input.disabled = false;
+                btn.disabled = false;
+                input.focus();
+                scrollToBottom();
+            }
+        });
+    </script>
+</body>
+</html>
