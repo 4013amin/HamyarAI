@@ -4,14 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ثبت‌نام در پنل هوشمند</title>
+    <!-- لود بهینه تایلویند -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700&display=swap');
-        body { font-family: 'Vazirmatn', sans-serif; }
+        /* استفاده از فونت‌های مدرن سیستمی بدون نیاز به لود از گوگل */
+        body { 
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+        }
+        form p {
+            margin-bottom: 1.25rem;
+        }
+        form label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 0.375rem;
+        }
+        .helptext {
+            display: block;
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+            line-height: 1.4;
+        }
+        ul.errorlist {
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: rgba(244, 63, 94, 0.1);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+            border-radius: 0.75rem;
+            color: #fda4af;
+            font-size: 0.75rem;
+            list-style-type: none;
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
     
+    <!-- افکت‌های نوری بک‌گراند -->
     <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none"></div>
     <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-[120px] pointer-events-none"></div>
 
@@ -23,22 +54,10 @@
 
         <form method="POST" class="space-y-4">
             {% csrf_token %}
-            {% for field in form %}
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-2" for="{{ field.id_for_label }}">
-                        {{ field.label }}
-                    </label>
-                    {{ field }}
-                    {% if field.help_text %}
-                        <p class="text-[10px] text-slate-500 mt-1 leading-relaxed">{{ field.help_text|safe }}</p>
-                    {% endif %}
-                    {% if field.errors %}
-                        {% for error in field.errors %}
-                            <p class="text-[11px] text-rose-400 mt-1 font-medium">{{ error }}</p>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-            {% endfor %}
+            
+            <div class="space-y-4">
+                {{ form.as_p }}
+            </div>
 
             <button type="submit" class="w-full mt-6 py-3 bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white font-semibold rounded-xl text-sm transition-all shadow-lg shadow-indigo-500/10">
                 ثبت‌نام و عضویت
