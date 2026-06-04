@@ -18,12 +18,12 @@ class Profile(models.Model):
 
 #ساخت به صورت پیشرفض کاربران
 @receiver(post_save, sender=User)
-def create_user_profile(sender , instanc , created , **kwargs):
+def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(user = instanc)
+        Profile.objects.create(user=instance) 
 
 
 #For Update Profile
-@receiver(post_save , sender=User)
-def save_user_Profile(sender , instance ,**kwargs):
-    instance.Profile.save()
+@receiver(post_save, sender=User)
+def save_user_Profile(sender, instance, **kwargs):
+    instance.profile.save() 
