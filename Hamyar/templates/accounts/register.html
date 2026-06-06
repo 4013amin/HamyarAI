@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -5,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ثبت‌نام در پنل هوشمند</title>
     <!-- لود بهینه تایلویند بدون فونت‌های گوگل -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="{% static 'account/js/tailwind.js' %}"></script>
     <style>
         body { 
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
