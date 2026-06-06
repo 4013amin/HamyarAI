@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-%oe6=&$*p0!l+fwzoddp((5#=*%^t6-81$-3(6!0oq%twz@ow2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -110,6 +110,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 LOGIN_REDIRECT_URL = 'profile' 
 LOGIN_URL = 'login'
+
+
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/

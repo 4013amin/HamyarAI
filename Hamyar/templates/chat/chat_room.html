@@ -16,10 +16,10 @@
                 linear-gradient(to right, rgba(255, 255, 255, 0.01) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
         }
-        #chat-box::-webkit-scrollbar { width: 4px; }
-        #chat-box::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.3); }
-        #chat-box::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 99px; }
-        #chat-box::-webkit-scrollbar-thumb:hover { background: #334155; }
+        #chat-box::-webkit-scrollbar, .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        #chat-box::-webkit-scrollbar-track, .sidebar-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.3); }
+        #chat-box::-webkit-scrollbar-thumb, .sidebar-scroll::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 99px; }
+        #chat-box::-webkit-scrollbar-thumb:hover, .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: #334155; }
     </style>
 </head>
 <body class="bg-[#030712] bg-grid text-slate-100 h-screen flex flex-col justify-between overflow-hidden relative">
@@ -30,7 +30,6 @@
     <!-- هدر ترمینال چت -->
     <header class="bg-slate-900/40 backdrop-blur-md border-b border-slate-800/60 p-4 md:px-8 flex items-center justify-between z-20">
         <div class="flex items-center gap-3">
-            <!-- رنگ لوگو بر اساس نوع ایجنت پویا تغییر می‌کند -->
             <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold shadow-lg
                 {% if session.agent_type == 'frontend' %} bg-gradient-to-tr from-sky-500 to-cyan-500 shadow-sky-500/20
                 {% elif session.agent_type == 'backend' %} bg-gradient-to-tr from-emerald-500 to-teal-500 shadow-emerald-500/20
@@ -40,46 +39,45 @@
             <div>
                 <h1 class="text-sm md:text-base font-bold text-slate-200">{{ session.get_agent_type_display }}</h1>
                 <p class="text-[10px] text-emerald-400 flex items-center gap-1.5 mt-0.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> هسته پردازشی متصل است
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> هسته پردازشی فعال
                 </p>
             </div>
         </div>
         <a href="{% url 'chat:dashboard' %}" class="px-3.5 py-1.5 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all">
-            خروج از ایستگاه چت
+            بازگشت به داشبورد
         </a>
     </header>
 
     <!-- بدنه اصلی چت (تقسیم به سایدبار دسکتاپ و محیط پیام) -->
     <div class="flex-1 flex overflow-hidden w-full max-w-7xl mx-auto z-10">
         
-        <!-- سایدبار کناری مشخصات فنی هوش مصنوعی (مخصوص دسکتاپ) -->
+        <!-- سایدبار کناری تاریخچه گفتگوها (حل مشکل قاطی نشدن گفتگوها) -->
         <aside class="w-72 bg-slate-900/20 border-l border-slate-900/60 p-6 hidden md:flex flex-col justify-between">
-            <div class="space-y-6">
-                <div>
-                    <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">مشخصات فنی ایجنت</h3>
-                    <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-3 space-y-2.5 text-xs text-slate-400">
-                        <div class="flex justify-between"><span>شناسه جلسه:</span><span class="font-mono text-slate-300">#{{ session.id }}</span></div>
-                        <div class="flex justify-between"><span>دما (Temp):</span><span class="text-slate-300">0.7</span></div>
-                        <div class="flex justify-between"><span>مدل پایه:</span><span class="text-slate-300 font-mono">GPT-4o</span></div>
-                    </div>
-                </div>
-
-                <div>
-                    <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">شخصیت فعال</h3>
-                    <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-3 text-[11px] text-slate-400 leading-relaxed">
-                        {% if session.agent_type == 'frontend' %}
-                            دستیار تخصصی فرانت‌اند؛ تمرکز بر رابط کاربری، کدهای کلاینت و فریم‌ورک‌های وب.
-                        {% elif session.agent_type == 'backend' %}
-                            دستیار تخصصی بک‌اند؛ تمرکز بر پایگاه‌های داده، معماری کدهای سرور و ارتباطات امنیتی.
-                        {% else %}
-                            دستیار همه‌منظوره؛ مجهز به توانایی‌های عمومی نگارش، محاسباتی و چند‌رشته‌ای.
-                        {% endif %}
-                    </div>
+            <div class="flex flex-col h-full overflow-hidden">
+                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">گفتگوهای اخیر شما</h3>
+                
+                <div class="flex-1 overflow-y-auto sidebar-scroll space-y-2.5 pr-1">
+                    {% for s in request.user.chat_sessions.all|dictsortreversed:"id" %}
+                        <a href="{% url 'chat:chat_room' s.id %}" class="flex items-center gap-3 p-3 rounded-xl border transition-all text-xs
+                            {% if s.id == session.id %}
+                                bg-indigo-950/40 border-indigo-500/30 text-indigo-300 font-semibold
+                            {% else %}
+                                bg-slate-900/20 border-slate-900/60 text-slate-400 hover:text-slate-200 hover:border-slate-800
+                            {% endif %}">
+                            <span class="w-2 h-2 rounded-full shrink-0
+                                {% if s.agent_type == 'frontend' %} bg-sky-500
+                                {% elif s.agent_type == 'backend' %} bg-emerald-500
+                                {% else %} bg-violet-500 {% endif %}"></span>
+                            <span class="truncate">گفتگو با {{ s.get_agent_type_display }}</span>
+                        </a>
+                    {% empty %}
+                        <p class="text-slate-600 text-xs text-center py-4">هنوز گفتگویی شروع نکرده‌اید.</p>
+                    {% endfor %}
                 </div>
             </div>
 
-            <div class="text-[10px] text-slate-600 leading-relaxed">
-                <p>پروتکل‌های ایمنی فعال هستند. پیام‌های شما در سرور محلی ذخیره می‌شوند.</p>
+            <div class="text-[10px] text-slate-600 border-t border-slate-900/60 pt-4 mt-4">
+                <p>پروتکل‌های ایمنی فعال هستند. پیام‌ها در پایگاه داده امن شما ذخیره می‌شوند.</p>
             </div>
         </aside>
 
@@ -100,7 +98,7 @@
                         <!-- حباب پیام شیشه‌ای نئون -->
                         <div class="max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-md border
                             {% if message.sender == 'user' %} bg-indigo-950/40 border-indigo-500/20 text-indigo-100 rounded-tr-none {% else %} bg-slate-900/40 border-slate-800 text-slate-200 rounded-tl-none {% endif %}">
-                            <p class="whitespace-pre-line">{{ message.content }}</p>
+                            <div class="msg-content whitespace-pre-line">{{ message.content }}</div>
                         </div>
                     </div>
                 {% empty %}
@@ -145,6 +143,24 @@
         </main>
     </div>
 
+    <!-- مدال پیش‌نمایش زنده کدهای فرانت‌اند (Live Sandbox) -->
+    <div id="preview-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-4xl h-[80vh] rounded-2xl flex flex-col overflow-hidden shadow-2xl relative">
+            <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-900">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <h3 class="text-sm font-bold text-slate-200">پیش‌نمایش زنده کدهای توسعه داده شده</h3>
+                </div>
+                <button onclick="closePreviewModal()" class="text-slate-400 hover:text-slate-200 text-xs font-semibold px-3 py-1.5 bg-slate-850 hover:bg-slate-800 border border-slate-800 rounded-xl transition-all">
+                    بستن پیش‌نمایش
+                </button>
+            </div>
+            <div class="flex-1 bg-white">
+                <iframe id="preview-iframe" class="w-full h-full border-none bg-white"></iframe>
+            </div>
+        </div>
+    </div>
+
     <!-- جاوااسکریپت مدیریت ارسال AJAX با تم جدید -->
     <script>
         const chatBox = document.getElementById('chat-box');
@@ -153,6 +169,97 @@
         const btn = document.getElementById('send-btn');
         const typingIndicator = document.getElementById('typing-indicator');
         const welcomeMessage = document.getElementById('welcome-message');
+
+        // موتور هوشمند رندر و تغییر ساختار کدهای خروجی
+        function parseMarkdown(text) {
+            const codeBlockRegex = /```(\w*)\n([\s\S]*?)\n```/g;
+            
+            return text.replace(codeBlockRegex, function(match, lang, code) {
+                lang = lang || 'code';
+                const escapedCode = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                
+                let runButton = '';
+                // بررسی زبان کد برای فعال‌سازی پیش‌نمایش زنده فرانت‌اند
+                if (['html', 'css', 'javascript', 'js'].includes(lang.toLowerCase())) {
+                    runButton = `
+                        <button type="button" onclick="runCode(this)" class="px-2.5 py-1 bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/30 text-emerald-400 rounded-lg text-[10px] transition-all flex items-center gap-1.5 font-sans font-semibold">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
+                            اجرای زنده
+                        </button>
+                    `;
+                }
+                
+                // در کانتینر زیر کلاس code-block-wrapper را برای استخراج کد با DOM تعریف کرده‌ایم
+                // همچنین خصوصیت dir="ltr" و text-left برای تراز چپ‌چین کدها اعمال شده است
+                return `
+                    <div class="code-block-wrapper my-4 border border-slate-800 rounded-xl overflow-hidden bg-slate-950 font-mono text-xs">
+                        <div class="bg-slate-900/80 px-4 py-2 border-b border-slate-800 flex justify-between items-center select-none">
+                            <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">${lang}</span>
+                            <div class="flex gap-2">
+                                ${runButton}
+                                <button type="button" onclick="copyCode(this)" class="px-2.5 py-1 bg-slate-850 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-slate-200 rounded-lg text-[10px] transition-all flex items-center gap-1.5 font-sans font-semibold">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3"/></svg>
+                                    کپی کد
+                                </button>
+                            </div>
+                        </div>
+                        <pre class="p-4 overflow-x-auto text-slate-300 leading-relaxed text-[11px] text-left" dir="ltr"><code>${escapedCode}</code></pre>
+                    </div>
+                `;
+            });
+        }
+
+        // کپی دقیق کدهای ارسالی با استفاده از پیمایش مستقیم DOM (کاملاً مقاوم در برابر حروف فارسی)
+        function copyCode(button) {
+            const wrapper = button.closest('.code-block-wrapper');
+            const codeEl = wrapper.querySelector('code');
+            const codeText = codeEl.innerText; // کپی متن خام بدون مشکل انکودینگ
+            
+            navigator.clipboard.writeText(codeText).then(() => {
+                const originalContent = button.innerHTML;
+                button.innerHTML = 'کپی شد!';
+                button.classList.add('text-emerald-400');
+                setTimeout(() => {
+                    button.innerHTML = originalContent;
+                    button.classList.remove('text-emerald-400');
+                }, 2000);
+            }).catch(err => {
+                console.error('خطا در کپی:', err);
+                alert('امکان کپی خودکار فراهم نشد. لطفاً کد را به صورت دستی کپی کنید.');
+            });
+        }
+
+        // اجرای زنده کدهای فرانت‌اند با استخراج مستقیم از DOM
+        function runCode(button) {
+            const wrapper = button.closest('.code-block-wrapper');
+            const codeEl = wrapper.querySelector('code');
+            const codeText = codeEl.innerText;
+            
+            const modal = document.getElementById('preview-modal');
+            const iframe = document.getElementById('preview-iframe');
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(codeText);
+            iframeDoc.close();
+        }
+
+        function closePreviewModal() {
+            const modal = document.getElementById('preview-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        // رندر و پردازش متون پیام‌های لود شده از دیتابیس در شروع باز شدن صفحه
+        function formatAllExistingMessages() {
+            document.querySelectorAll('.msg-content').forEach(el => {
+                el.innerHTML = parseMarkdown(el.innerHTML);
+            });
+        }
+        formatAllExistingMessages();
 
         function scrollToBottom() {
             chatBox.scrollTop = chatBox.scrollHeight;
@@ -183,12 +290,12 @@
 
             if (welcomeMessage) welcomeMessage.style.display = 'none';
 
-            // ساخت حباب پیام با تم جدید شیشه‌ای
+            // رندر پیام جدید کاربر به صورت ریل‌تایم
             const userBubble = `
                 <div class="flex gap-4 flex-row-reverse">
                     <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-600 text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-sm">U</div>
                     <div class="max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-indigo-950/40 border border-indigo-500/20 text-indigo-100 rounded-tr-none shadow-md">
-                        <p class="whitespace-pre-line">${message}</p>
+                        <div class="msg-content whitespace-pre-line">${parseMarkdown(message)}</div>
                     </div>
                 </div>
             `;
@@ -212,12 +319,12 @@
                 const data = await response.json();
 
                 if (data.status === 'success') {
-                    // حباب هوش مصنوعی شیشه‌ای
+                    // رندر پاسخ جدید هوش مصنوعی به همراه ترمینال کپی و اجرای زنده
                     const aiBubble = `
                         <div class="flex gap-4">
                             <div class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 flex items-center justify-center text-xs font-bold shrink-0 shadow-sm">AI</div>
                             <div class="max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-slate-900/40 border border-slate-800 text-slate-200 rounded-tl-none shadow-md">
-                                <p class="whitespace-pre-line">${data.reply}</p>
+                                <div class="msg-content whitespace-pre-line">${parseMarkdown(data.reply)}</div>
                             </div>
                         </div>
                     `;
